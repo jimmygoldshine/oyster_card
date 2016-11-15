@@ -26,4 +26,27 @@ describe Oystercard do
     expect(subject.deduct(10)).to eq -10
   end
 
+  it "confirms that the card has been touched in" do
+    expect(subject.touch_in).to eq true
+  end
+
+  it "confirms that the card has been touched out" do
+    expect(subject.touch_out).to eq true
+  end
+
+  # it "checks whether the card is part way through a journey" do
+  #   expect(subject.in_journey?).to eq true
+  # end
+
+  it "checks if the card is in use" do
+    subject.touch_in
+    expect(subject.in_use).to eq true
+  end
+
+  it "checks if the card has stopped being in use" do
+    subject.touch_in
+    subject.touch_out
+    expect(subject.in_journey?).to eq false
+  end
+
 end
