@@ -18,4 +18,12 @@ describe Oystercard do
     expect { (subject.top_up(95)) }.to raise_error "Error: top up failed, maximum value cannot exceed #{subject.class::DEFAULT_OYSTER_MAX_BALANCE}"
   end
 
+  it "checks that deduct method can be passed one argument" do
+    expect(subject).to respond_to(:deduct).with(1).argument
+  end
+
+  it "checks that it will deduct the fare from the oystercard balance" do
+    expect(subject.deduct(10)).to eq -10
+  end
+
 end
