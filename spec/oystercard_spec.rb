@@ -5,11 +5,8 @@ describe Oystercard do
     expect(subject.balance).to eq 0
   end
 
-
-
-
-  # In order to use public transport
-  # As a customer
-  # I want money on my card
-
+  it "checks that top_up method can be passed one argument" do
+    expect(subject).to respond_to(:top_up).with(1).argument
+  end
+  
 end
