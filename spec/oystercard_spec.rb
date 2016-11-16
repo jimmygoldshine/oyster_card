@@ -3,7 +3,8 @@ require './lib/oystercard'
 describe Oystercard do
 
   let(:card) {described_class.new}
-  let(:station) {double :station}
+  let(:entry_station) {double :entry_station}
+  let(:exit_station) {double :exit_station}
 
   it "checks a new card has a default balance of zero" do
     expect(card.balance).to eq 0
@@ -29,7 +30,7 @@ describe Oystercard do
   context "Not enough money on Oystercard" do
 
     it "raises an error when touch in without enough money" do
-      expect{card.touch_in(station)}.to raise_error("Error: Not enough money on card for journey")
+      expect{card.touch_in(entry_station)}.to raise_error("Error: Not enough money on card for journey")
     end
   end
 
@@ -40,26 +41,30 @@ describe Oystercard do
     end
 
     it "checks if the card is in use" do
-      card.touch_in(station)
+      card.touch_in(entry_station)
       expect(card.in_use).to eq true
     end
 
     it "checks if the card has stopped being in use" do
-      card.touch_in(station)
-      card.touch_out
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
       expect(card.in_journey?).to eq false
     end
 
     it "confirms that the card has been touched in" do
-      expect(card.touch_in(station)).to eq true
+      expect(card.touch_in(entry_station)).to eq true
     end
 
 
     describe "Touching out " do
 
       it "touching out reduces the balance by the minimum fare" do
-        card.touch_in(station)
-        expect{card.touch_out}.to change{card.balance}.by -Oystercard::MINIMUM_FARE
+        card.touch_in(entry_station)
+        expect{card.touch_out(exit_station)}.to change{card.balance}.by -Oystercard::MINIMUM_FARE
+      end
+
+      it "touch_out accepts a station as an argument" do
+        expect(card).to respond_to(:touch_out).with(1).argument
       end
 
     end
@@ -74,6 +79,18 @@ describe Oystercard do
       it "checks if card returns entry station" do
         card.touch_in("kings cross")
         expect(card.entry_station).to eq "kings cross"
+      end
+    end
+
+    describe "Journey history" do
+      it "journey history is empty by default" do
+        expect(card.journey_history).to eq []
+      end
+
+      it "touching in and touching out creates a journey hash" do
+        card.touch_in(entry_station)
+        card.touch_out(exit_station)
+        expect(card.journey_history).to eq [{:entry_station => entry_station, :exit_station => exit_station}]
       end
     end
 
