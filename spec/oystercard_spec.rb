@@ -53,17 +53,17 @@ describe Oystercard do
       expect(card.touch_in).to eq true
     end
 
-    it "checks that deduct method can be passed one argument" do
-      expect(card).to respond_to(:deduct).with(1).argument
+
+    describe "Touching out " do
+
+      it "touching out reduces the balance by the minimum fare" do
+        card.touch_in
+        expect{card.touch_out}.to change{card.balance}.by -Oystercard::MINIMUM_FARE
+      end
+
     end
 
-    it "checks that it will deduct the fare from the oystercard balance" do
-      expect{card.deduct(3)}.to change{ card.balance }.by -3
-    end
 
-    it "confirms that the card has been touched out" do
-      expect(card.touch_out).to eq true
-    end
   end
 
 end

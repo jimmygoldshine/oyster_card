@@ -23,22 +23,26 @@ MINIMUM_FARE = 1
     @balance < MINIMUM_FARE
   end
 
-
-  def deduct(fare)
-    @balance -= fare
-  end
-
   def touch_in
     raise "Error: Not enough money on card for journey" if balance_is_under_minimum_fare?
     @in_use = true
   end
 
   def touch_out
-    true
+    deduct(MINIMUM_FARE)
+    @in_use = false
   end
 
   def in_journey?
-    touch_in && !touch_out
+    @in_use
   end
+
+  private
+
+  def deduct(fare)
+    @balance -= fare
+  end
+
+
 
 end
