@@ -1,16 +1,18 @@
+require_relative 'station'
+require_relative 'journey'
+
 class Oystercard
 
-attr_reader :balance, :in_use, :entry_station, :journey_history, :exit_station
+attr_reader :balance, :history
 
 DEFAULT_OYSTER_MAX_BALANCE = 90
 MINIMUM_FARE = 1
+PENALTY_FARE = 6
 
   def initialize
     @balance = 0
-    @in_use = false
-    @entry_station
-    @exit_station
-    @journey_history = []
+    @history = []
+    @journey
   end
 
   def top_up(value)
@@ -27,25 +29,38 @@ MINIMUM_FARE = 1
   end
 
   def touch_in(entry_station)
+    deduct(PENALTY_FARE) if invalid_entry?
     raise "Error: Not enough money on card for journey" if balance_is_under_minimum_fare?
-    @entry_station = entry_station
-    @in_use = true
+    @journey = Journey.new(entry_station)
+    @journey.entry_station
   end
 
   def touch_out(exit_station)
-    deduct(MINIMUM_FARE)
-    @exit_station = exit_station
-    add_journey
-    @entry_station = nil
-    @in_use = false
+
+
+    invalid_exit? ? deduct(PENALTY_FARE) : deduct(MINIMUM_FARE)
+    @journey.add_exit_station(exit_station)
+    @history << @journey.add_journey
   end
 
-  def add_journey
-    @journey_history << {:entry_station => entry_station, :exit_station => exit_station}
+  # def fare
+  #   return MINIMUM_FARE if @journey.in_journey?
+  #   6
+  # end
+
+  def invalid_exit?
+    !@journey.in_journey?
   end
 
-  def in_journey?
-    !!@entry_station
+  def invalid_entry?
+    if @journey.nil?
+      false
+    else
+      @journey.in_journey?
+    end
+
+
+
   end
 
   private
@@ -53,6 +68,10 @@ MINIMUM_FARE = 1
   def deduct(fare)
     @balance -= fare
   end
+
+
+
+
 
 
 
